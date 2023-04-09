@@ -82,6 +82,14 @@
   </div>
 </template>
 
+<style>
+.container{
+  margin-top: 50px;
+  border-left-style: outset;
+  border-right-style: outset;
+}
+</style>
+
 <script>
 export default{
   name:'app',
