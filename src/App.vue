@@ -3,16 +3,18 @@
     <div class="container">
       <header class="text-center bg-dark p-5 text-white fs-3">My ToDo List</header>
       
-      <div class="input-group bg-secondary my-3">
+      <div class="input-group bg-secondary mt-3">
         <input type="text" class="form-control" placeholder="Add Procedure" v-model="userInput.todo"  v-on:keyup.enter="addProcedure" aria-label="Recipient's username" aria-describedby="basic-addon2">
         <div class="input-group-append" style="background-color: rgba(221, 221, 221, 0.892);">
           <button class="btn btn-dark text-white rounded mx-1" type="button" @click="addProcedure">Add</button>
           <button class="btn btn-dark text-white rounded mx-1" type="button" v-if="doneTasks != '' && showCompletedTasksStatus == false" @click="showCompletedTasks">Show Completed Tasks</button>
           <button class="btn btn-dark text-white rounded mx-1" type="button" v-if="doneTasks != '' && showCompletedTasksStatus == true" @click="hideCompletedTasks">Hide Completed Tasks</button>
+          <button class="btn btn-dark text-white rounded mx-1" type="button" v-if="tasks.length != 0" @click="deleteTasks">Delete Tasks</button>
         </div>
       </div>
+      <small class="text-danger" v-if="inputValidation">Please type something to add.</small>
 
-      <table class="table">
+      <table class="table mt-3" v-if="tasks.length != 0">
         <thead class="bg-white text-dark">
           <tr>
             <th scope="col">No</th>
@@ -42,11 +44,14 @@
           </tr>
         </tbody>
       </table>
+      <div v-else class="my-3 text-center text-white p-3 bg-warning bg-opacity-50">
+        Please add some procedure!
+      </div>
       <hr>
 
-      <header class="text-center bg-secondary p-3 text-white fs-3" v-if="showCompletedTasksStatus == true">Done Tasks</header>
+      <header class="text-center bg-secondary p-3 text-white fs-3" v-if="showCompletedTasksStatus == true && doneTasks.length != 0">Done Tasks</header>
 
-      <table class="table" v-if="showCompletedTasksStatus == true">
+      <table class="table" v-if="showCompletedTasksStatus == true && doneTasks.length != 0">
         <thead class="bg-white text-dark">
           <tr>
             <th scope="col">No</th>
@@ -66,7 +71,7 @@
             <td v-else>Need to workon</td>
 
             <td >
-              <input type="checkbox" name="" id="" v-model="item.done" checked disabled>
+              <input type="checkbox" name="" id="" v-model="item.done" disabled>
             </td>
 
           </tr>
@@ -88,6 +93,7 @@ export default{
     tasks :[],
     doneTasks:[],
     showCompletedTasksStatus : false,
+    inputValidation : false,
   }),
   methods:{
     addProcedure(){
@@ -97,6 +103,10 @@ export default{
           done: this.userInput.done
         })
         this.userInput.todo = ''
+        var todoList = this.tasks;
+        sessionStorage.setItem('My Todo List',JSON.stringify(todoList));
+      }else{
+        this.inputValidation = true;
       }
     },
 
@@ -105,7 +115,10 @@ export default{
       this.doneTasks.push({
         todo: this.tasks[index].todo,
         done: this.tasks.done
-      })
+      });
+      this.tasks.splice(index,1);
+      var myDoneTask = this.doneTasks;
+      sessionStorage.setItem('My Done Tasks', JSON.stringify(myDoneTask));
     },
 
     showCompletedTasks(){
@@ -116,6 +129,21 @@ export default{
 
     hideCompletedTasks(){
         this.showCompletedTasksStatus = false;
+    },
+
+    deleteTasks(){
+      this.tasks.splice(0);
+      this.doneTasks.splice(0);
+      sessionStorage.removeItem('My Todo List');
+      sessionStorage.removeItem('My Done Tasks');
+    }
+  },
+  mounted(){    //same as created()
+    let data = sessionStorage.getItem('My Todo List');
+    let doneJobs = sessionStorage.getItem('My Done Tasks');
+    if(data && doneJobs){
+      this.tasks = JSON.parse(data);
+      this.doneTasks = JSON.parse(doneJobs);
     }
   }
 }
