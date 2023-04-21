@@ -4,7 +4,7 @@
       <header class="text-center bg-dark p-5 text-white fs-3">My ToDo List</header>
       
       <div class="input-group bg-secondary mt-3">
-        <input type="text" class="form-control" placeholder="Add Procedure" v-model="userInput.todo"  v-on:keyup.enter="addProcedure" aria-label="Recipient's username" aria-describedby="basic-addon2">
+        <input type="text" class="form-control" :class="{ 'is-invalid' : inputValidation }" placeholder="Add Procedure" v-model="userInput.todo"  v-on:keyup.enter="addProcedure" aria-label="Recipient's username" aria-describedby="basic-addon2">
         <div class="input-group-append" style="background-color: rgba(221, 221, 221, 0.892);">
           <button class="btn btn-dark text-white rounded mx-1" type="button" @click="addProcedure">Add</button>
           <button class="btn btn-dark text-white rounded mx-1" type="button" v-if="doneTasks != '' && showCompletedTasksStatus == false" @click="showCompletedTasks">Show Completed Tasks</button>
@@ -102,8 +102,10 @@ export default{
     doneTasks:[],
     showCompletedTasksStatus : false,
     inputValidation : false,
+    foodCategory : [],
   }),
   methods:{
+
     addProcedure(){
       if(this.userInput.todo != ''){
         this.tasks.push({
@@ -127,6 +129,8 @@ export default{
       this.tasks.splice(index,1);
       var myDoneTask = this.doneTasks;
       sessionStorage.setItem('My Done Tasks', JSON.stringify(myDoneTask));
+      let data = JSON.parse(sessionStorage.getItem('My Todo List'));
+      console.log(data[index].splice)
     },
 
     showCompletedTasks(){
